@@ -1,7 +1,7 @@
-import React from "react";
-import PhrazzleField from "./components/Phrazzle-Field";
+import React, { useEffect } from "react";
+import PhrazzleField from "./components/Phrazzle-Start";
 import Phrazzle from "./components/Phrazzle";
-import { ThemeProvider, createTheme } from "@mui/material";
+import { Container, ThemeProvider, createTheme } from "@mui/material";
 
 // Create a color scheme
 const theme = createTheme({
@@ -29,8 +29,9 @@ function App() {
                 <h2>Custom Phrazzle</h2>
             </header>
             <div className="Main">
-                <PhrazzleField />
-                <Phrazzle phrase="apple for two" />
+                <Container>
+                    <PhrazzleField />
+                </Container>
             </div>
         </ThemeProvider>
     );
