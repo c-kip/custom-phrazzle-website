@@ -22,14 +22,14 @@ const theme = createTheme({
 
 function App() {
     return (
-        <div className="Main">
+        <div>
             <header className="Main-header">
                 <h2>Custom Phrazzle</h2>
             </header>
-            <body>
+            <div className="Main">
                 <PhrazzleField />
-                <Phrazzle />
-            </body>
+                <Phrazzle phrase="apple for two" />
+            </div>
         </div>
     );
 }
