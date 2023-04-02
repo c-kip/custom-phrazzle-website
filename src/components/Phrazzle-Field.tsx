@@ -2,7 +2,15 @@ import React from "react";
 import { TextField } from "@mui/material";
 
 function PhrazzleField() {
-    return <TextField label="Enter phrase here" variant="standard"></TextField>;
+    const isInvalid: boolean = false;
+
+    return (
+        <TextField
+            label="Enter phrase here"
+            variant="standard"
+            error={isInvalid}
+        ></TextField>
+    );
 }
 
 export default PhrazzleField;
