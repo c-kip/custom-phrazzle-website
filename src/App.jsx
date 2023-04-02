@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
-import PhrazzleField from "./components/Phrazzle-Start";
-import Phrazzle from "./components/Phrazzle";
-import { Container, ThemeProvider, createTheme } from "@mui/material";
+import GameManager from "./components/Game-Manager";
+import {
+    Container,
+    ThemeProvider,
+    Typography,
+    createTheme,
+} from "@mui/material";
 
 // Create a color scheme
 const theme = createTheme({
@@ -26,11 +30,11 @@ function App() {
     return (
         <ThemeProvider theme={theme}>
             <header className="Main-header">
-                <h2>Custom Phrazzle</h2>
+                <Typography variant="h2">Custom Phrazzle 1.0</Typography>
             </header>
             <div className="Main">
                 <Container>
-                    <PhrazzleField />
+                    <GameManager />
                 </Container>
             </div>
         </ThemeProvider>

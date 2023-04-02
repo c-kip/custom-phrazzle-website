@@ -4,6 +4,7 @@ import { Grid } from "@mui/material";
 
 interface PhrazzleProps {
     phrase: string;
+    guess: string;
 }
 
 function parsePhrase(phrase: string): string[] {
