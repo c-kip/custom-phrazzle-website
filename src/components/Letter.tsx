@@ -1,5 +1,5 @@
 import React from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { LetterType } from "../constants";
 
 interface LetterProps {
@@ -10,6 +10,7 @@ interface LetterProps {
 function Letter(props: LetterProps) {
     let boxBackground: string;
     let textColour: string;
+    const letter = props.letter.toUpperCase();
 
     switch (props.type) {
         case LetterType.Correct:
@@ -36,8 +37,19 @@ function Letter(props: LetterProps) {
     }
 
     return (
-        <Box sx={{ backgroundColor: boxBackground }}>
-            <p color={textColour}>{props.letter}</p>
+        <Box
+            justifyContent="center"
+            sx={{
+                backgroundColor: boxBackground,
+                border: 2,
+                borderRadius: 1,
+                width: "5%",
+                height: "5%",
+            }}
+        >
+            <Typography variant="h3" color={textColour}>
+                {letter}
+            </Typography>
         </Box>
     );
 }
