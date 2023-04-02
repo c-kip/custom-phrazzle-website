@@ -1,4 +1,5 @@
 import React from "react";
+import PhrazzleField from "./components/Phrazzle-Field";
 
 function App() {
   return (
@@ -6,6 +7,9 @@ function App() {
       <header className="Main-header">
         <h2>Custom Phrazzle</h2>
       </header>
+      <body>
+        <PhrazzleField />
+      </body>
     </div>
   );
 }
