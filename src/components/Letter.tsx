@@ -8,28 +8,36 @@ interface LetterProps {
 }
 
 function Letter(props: LetterProps) {
+    let boxBackground: string;
+    let textColour: string;
+
     switch (props.type) {
         case LetterType.Correct:
-            console.log(`${props.letter} is correct`);
+            boxBackground = "letter.background.correct";
+            textColour = "letter.text.light";
             break;
         case LetterType.Miss:
-            console.log(`${props.letter} is a miss`);
+            boxBackground = "letter.background.miss";
+            textColour = "letter.text.light";
             break;
         case LetterType.DiffWord:
-            console.log(`${props.letter} is in a different word`);
+            boxBackground = "letter.background.diffWord";
+            textColour = "letter.text.light";
             break;
         case LetterType.Close:
-            console.log(`${props.letter} is close`);
+            boxBackground = "letter.background.close";
+            textColour = "letter.text.light";
             break;
         case LetterType.Guess:
         default:
-            console.log(`${props.letter} is a guess`);
+            boxBackground = "letter.background.guess";
+            textColour = "letter.text.dark";
             break;
     }
 
     return (
-        <Box sx={{ backgroundColor: "primary.dark" }}>
-            <p>{props.letter}</p>
+        <Box sx={{ backgroundColor: boxBackground }}>
+            <p color={textColour}>{props.letter}</p>
         </Box>
     );
 }
