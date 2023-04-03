@@ -26,7 +26,7 @@ function GameManager() {
     const [gameMsg, setGameMsg] = useState(startGameMsg);
     const [phrase, setPhrase] = useState("");
     const [guess, setGuess] = useState("");
-    const [finalGuess, setFinalGuess] = useState("");
+    const [verify, setVerify] = useState(false);
 
     function updateGameState(state: GameState) {
         // Update the game msg based on the new state
@@ -38,10 +38,10 @@ function GameManager() {
                 break;
             case GameState.guess:
                 setGameMsg(guessGameMsg);
+                setGuess("");
                 break;
             case GameState.finish:
                 setGameMsg(finishGameMsg);
-                setGuess("");
                 break;
             default:
                 setGameMsg("Game broken. 🙁");
@@ -74,7 +74,7 @@ function GameManager() {
                     updateGameState(GameState.guess);
                     break;
                 case GameState.guess:
-                    setFinalGuess(guess);
+                    setVerify(true);
                     break;
                 case GameState.finish:
                     updateGameState(GameState.start);
@@ -91,12 +91,14 @@ function GameManager() {
                 case GameState.start:
                     // During start, update the phrase
                     setPhrase(phrase + letter);
-                    console.log(`Current phrase: "${phrase}"`);
-                    console.log(`Phrase set to "${phrase + letter}"`);
+                    setGuess(phrase + letter);
                     break;
                 case GameState.guess:
                     // During guess, update the guess
-                    setGuess(guess);
+                    if (guess.length < phrase.length) {
+                        console.log(`Updating guess to ${guess + letter}`);
+                        setGuess(guess + letter);
+                    }
                     break;
                 case GameState.finish:
                     // Do nothing in finish state
@@ -121,7 +123,7 @@ function GameManager() {
     return (
         <>
             <Typography>{gameMsg}</Typography>
-            <Phrazzle phrase={phrase} guess={finalGuess} />
+            <Phrazzle phrase={phrase} guess={guess} verify={verify} />
         </>
     );
 }

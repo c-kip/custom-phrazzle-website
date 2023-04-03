@@ -7,6 +7,7 @@ import { PhrazzleLetter } from "../logic/PhrazzleLetter";
 interface PhrazzleProps {
     phrase: string;
     guess: string;
+    verify: boolean;
 }
 
 function parsePhrase(phrase: string): PhrazzleLetter[][] {
@@ -28,12 +29,16 @@ function parsePhrase(phrase: string): PhrazzleLetter[][] {
  * Returns true if the guess letter can be found in the phrase, and marks the
  * matching letter as "guessed"
  * @param {PhrazzleLetter[]} phrase The word to verify against
- * @param {string} guess The letter to guess
+ * @param {PhrazzleLetter} guess The letter to guess
  * @returns {boolean} True if the letter is in the word
  */
-function findNearMiss(phrase: PhrazzleLetter[], guess: string): boolean {
+function findNearMiss(
+    phrase: PhrazzleLetter[],
+    guess: PhrazzleLetter
+): boolean {
     phrase.forEach((pLetter) => {
-        if (pLetter.letter === guess && pLetter.type === LetterType.Guess) {
+        if (pLetter.letter === guess.letter && !pLetter.guessed) {
+            // mark the letter as "used"
             pLetter.guessed = true;
             return true;
         }
@@ -42,10 +47,14 @@ function findNearMiss(phrase: PhrazzleLetter[], guess: string): boolean {
     return false;
 }
 
-function findDiffWord(phrase: PhrazzleLetter[][], guess: string): boolean {
+function findDiffWord(
+    phrase: PhrazzleLetter[][],
+    guess: PhrazzleLetter
+): boolean {
     phrase.forEach((pWord) => {
         pWord.forEach((pLetter) => {
-            if (pLetter.letter === guess && pLetter.type === LetterType.Guess) {
+            if (pLetter.letter === guess.letter && !pLetter.guessed) {
+                // mark the letter as "used"
                 pLetter.guessed = true;
                 return true;
             }
@@ -56,39 +65,70 @@ function findDiffWord(phrase: PhrazzleLetter[][], guess: string): boolean {
 }
 
 // Lazy function that checks which letters are "correct", and so on
-function verifyPhrase(rawPhrase: string, rawGuess: string): PhrazzleLetter[][] {
+function verifyPhrase(
+    rawPhrase: string,
+    rawGuess: string,
+    verify: boolean
+): {
+    phrase: PhrazzleLetter[][];
+    guess: PhrazzleLetter[][];
+} {
     const phrase = parsePhrase(rawPhrase);
-    const guess = rawGuess.trim().split(" ");
+    const guess = parsePhrase(rawGuess);
 
-    // If the guess exists, verify it
-    if (rawGuess !== "") {
+    // If the guess exists & has same length as phrase, verify it
+    if (rawGuess !== "" && rawGuess.length === rawPhrase.length && verify) {
         phrase.forEach((pWord, wordIndex) => {
             pWord.forEach((pLetter, letterIndex) => {
-                const guessLetter = guess[wordIndex].charAt(letterIndex);
+                const guessLetter = guess[wordIndex][letterIndex];
 
                 // If the letter is correct label it
-                if (pLetter.letter === guessLetter) {
+                if (pLetter.letter === guessLetter.letter) {
                     pLetter.guessed = true;
-                    pLetter.type = LetterType.Correct;
+                    guessLetter.type = LetterType.Correct;
                 } else if (findNearMiss(pWord, guessLetter)) {
                     // Mark as in same word
-                    pLetter.type = LetterType.RightWord;
+                    guessLetter.type = LetterType.RightWord;
                 } else if (findDiffWord(phrase, guessLetter)) {
                     // Mark as in diff word
-                    pLetter.type = LetterType.WrongWord;
+                    guessLetter.type = LetterType.WrongWord;
                 } else {
                     // Mark as missing otherwise
-                    pLetter.type = LetterType.Miss;
+                    guessLetter.type = LetterType.Miss;
                 }
             });
         });
     }
 
-    return phrase;
+    return { phrase, guess };
 }
 
 function Phrazzle(props: PhrazzleProps) {
-    const parsedPhraseWords = verifyPhrase(props.phrase, props.guess);
+    const { phrase, guess } = verifyPhrase(
+        props.phrase,
+        props.guess,
+        props.verify
+    );
+
+    // Fill the guess with blanks at the end if the phrase has been set
+    if (props.phrase.length > props.guess.length) {
+        for (let wordIndex = 0; wordIndex < phrase.length; wordIndex++) {
+            // Add a blank word if needed
+            if (wordIndex > guess.length) {
+                guess.push([]);
+            }
+
+            const letterDiff =
+                phrase[wordIndex].length - guess[wordIndex].length;
+            if (letterDiff > 0) {
+                for (let i = 0; i < letterDiff; i++) {
+                    guess[wordIndex].push(
+                        new PhrazzleLetter("?", LetterType.Guess, false)
+                    );
+                }
+            }
+        }
+    }
 
     return (
         <Grid
@@ -97,7 +137,7 @@ function Phrazzle(props: PhrazzleProps) {
             justifyContent="center"
             alignItems="center"
         >
-            {parsedPhraseWords.map((word, wordIndex) => {
+            {guess.map((word, wordIndex) => {
                 const key = wordIndex.toString() + word;
 
                 return (
