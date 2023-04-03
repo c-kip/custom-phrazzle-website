@@ -28,6 +28,10 @@ function GameManager() {
     const [guesses, setGuesses] = useState([""]);
     const [verifies, setVerifies] = useState([false]);
 
+    function setFinish() {
+        setGameState(GameState.finish);
+    }
+
     function setLatestGuess(guess: string) {
         const allGuesses = [...guesses];
         allGuesses[allGuesses.length - 1] = guess;
@@ -201,6 +205,7 @@ function GameManager() {
                         phrase={phrase}
                         guess={guess}
                         verify={verifies[index]}
+                        setFinish={setFinish}
                         key={index.toString() + guess}
                     />
                 );
