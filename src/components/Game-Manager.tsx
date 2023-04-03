@@ -25,12 +25,17 @@ function GameManager() {
     const [gameState, setGameState] = useState(GameState.start);
     const [gameMsg, setGameMsg] = useState(startGameMsg);
     const [phrase, setPhrase] = useState("");
-    const [guess, setGuess] = useState("");
-    const [verify, setVerify] = useState(false);
+    const [guesses, setGuesses] = useState([""]);
+    const [verifies, setVerifies] = useState([false]);
+
+    function setLatestGuess(guess: string) {
+        const allGuesses = [...guesses];
+        allGuesses[allGuesses.length - 1] = guess;
+        setGuesses(allGuesses);
+    }
 
     function updateGameState(state: GameState) {
         // Update the game msg based on the new state
-        console.log(`Set game state to ${state}`);
         switch (state) {
             case GameState.start:
                 setGameMsg(startGameMsg);
@@ -38,7 +43,7 @@ function GameManager() {
                 break;
             case GameState.guess:
                 setGameMsg(guessGameMsg);
-                setGuess("");
+                setGuesses([""]);
                 break;
             case GameState.finish:
                 setGameMsg(finishGameMsg);
@@ -74,7 +79,13 @@ function GameManager() {
                     updateGameState(GameState.guess);
                     break;
                 case GameState.guess:
-                    setVerify(true);
+                    // Update the current guess to be verified, maintain all others
+                    const allVerifies = [...verifies];
+                    allVerifies[allVerifies.length - 1] = true;
+                    allVerifies.push(false);
+
+                    setVerifies(allVerifies);
+                    setGuesses([...guesses, ""]);
                     break;
                 case GameState.finish:
                     updateGameState(GameState.start);
@@ -91,18 +102,21 @@ function GameManager() {
                 case GameState.start:
                     // During start, update the phrase
                     setPhrase(phrase + letter);
-                    setGuess(phrase + letter);
+                    setLatestGuess(phrase + letter);
                     break;
                 case GameState.guess:
                     // If the next letter is a space, include it
-                    if (spaceChar.test(phrase[guess.length + 1])) {
+                    if (
+                        spaceChar.test(
+                            phrase[guesses[guesses.length - 1].length + 1]
+                        )
+                    ) {
                         letter += " ";
                     }
 
                     // During guess, update the guess
-                    if (guess.length < phrase.length) {
-                        console.log(`Updating guess to ${guess + letter}`);
-                        setGuess(guess + letter);
+                    if (guesses[guesses.length - 1].length < phrase.length) {
+                        setLatestGuess(guesses[guesses.length - 1] + letter);
                     }
                     break;
                 case GameState.finish:
@@ -128,7 +142,17 @@ function GameManager() {
     return (
         <>
             <Typography>{gameMsg}</Typography>
-            <Phrazzle phrase={phrase} guess={guess} verify={verify} />
+            {guesses.map((guess, index) => {
+                console.log(`Verify guess? ${verifies[index]}`);
+                return (
+                    <Phrazzle
+                        phrase={phrase}
+                        guess={guess}
+                        verify={verifies[index]}
+                        key={index.toString() + guess}
+                    />
+                );
+            })}
         </>
     );
 }

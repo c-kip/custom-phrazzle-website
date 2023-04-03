@@ -164,6 +164,7 @@ function Phrazzle(props: PhrazzleProps) {
                         direction="row"
                         justifyContent="center"
                         alignItems="center"
+                        key={`grid-${wordIndex}`}
                     >
                         {/* Map each letter in the word to a Letter component */}
                         {word.map((phrazzleLetter, index) => (
