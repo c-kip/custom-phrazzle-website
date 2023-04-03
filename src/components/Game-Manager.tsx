@@ -63,7 +63,7 @@ function GameManager() {
             validPunctuation.test(event.key)
         ) {
             letter = event.key;
-        } else if (spaceChar.test(event.key)) {
+        } else if (gameState === GameState.start && spaceChar.test(event.key)) {
             // Ignore multiple spaces in a row
             if (!spaceChar.test(phrase[phrase.length - 1])) {
                 letter = event.key;
@@ -94,6 +94,11 @@ function GameManager() {
                     setGuess(phrase + letter);
                     break;
                 case GameState.guess:
+                    // If the next letter is a space, include it
+                    if (spaceChar.test(phrase[guess.length + 1])) {
+                        letter += " ";
+                    }
+
                     // During guess, update the guess
                     if (guess.length < phrase.length) {
                         console.log(`Updating guess to ${guess + letter}`);

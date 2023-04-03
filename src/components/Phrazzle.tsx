@@ -37,17 +37,17 @@ function findNearMiss(
     guess: PhrazzleLetter
 ): boolean {
     return !phrase.every((pLetter) => {
-        console.log(
-            `Phrase letter: ${pLetter.letter}, guessed: ${pLetter.guessed}`
-        );
-        console.log(`Checking against ${guess.letter}`);
+        // console.log(
+        //     `Phrase letter: ${pLetter.letter}, guessed: ${pLetter.guessed}`
+        // );
+        // console.log(`Checking against ${guess.letter}`);
         if (pLetter.letter === guess.letter && !pLetter.guessed) {
             // mark the letter as "used"
-            console.log(`Match found`);
+            // console.log(`Match found`);
             pLetter.guessed = true;
             return false; // end the every()
         }
-        return true;
+        return true; // continue the every()
     });
 }
 
@@ -55,17 +55,16 @@ function findDiffWord(
     phrase: PhrazzleLetter[][],
     guess: PhrazzleLetter
 ): boolean {
-    phrase.forEach((pWord) => {
-        pWord.forEach((pLetter) => {
+    return !phrase.every((pWord) => {
+        return pWord.every((pLetter) => {
             if (pLetter.letter === guess.letter && !pLetter.guessed) {
                 // mark the letter as "used"
                 pLetter.guessed = true;
-                return true;
+                return false; // end the every()
             }
+            return true; // continue the every()
         });
     });
-
-    return false;
 }
 
 // Lazy function that checks which letters are "correct", and so on
@@ -121,7 +120,7 @@ function Phrazzle(props: PhrazzleProps) {
     if (props.phrase.length > props.guess.length) {
         for (let wordIndex = 0; wordIndex < phrase.length; wordIndex++) {
             // Add a blank word if needed
-            if (wordIndex > guess.length) {
+            if (wordIndex >= guess.length) {
                 guess.push([]);
             }
 
