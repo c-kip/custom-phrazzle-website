@@ -87,7 +87,7 @@ function verifyPhrase(
 
     // If the guess exists & has same length as phrase, verify it
     if (rawGuess !== "" && rawGuess.length === rawPhrase.length && verify) {
-        // First loop marks correct and same word matches
+        // First loop marks correct
         phrase.forEach((pWord, wordIndex) => {
             pWord.forEach((pLetter, letterIndex) => {
                 const guessLetter = guess[wordIndex][letterIndex];
@@ -96,7 +96,17 @@ function verifyPhrase(
                 if (pLetter.letter === guessLetter.letter) {
                     pLetter.guessed = true;
                     guessLetter.type = LetterType.Correct;
-                } else if (findNearMiss(pWord, guessLetter)) {
+                }
+            });
+        });
+
+        // Second loop matches same word
+        phrase.forEach((pWord, wordIndex) => {
+            pWord.forEach((pLetter, letterIndex) => {
+                const guessLetter = guess[wordIndex][letterIndex];
+
+                // If the letter is in the word label it
+                if (findNearMiss(pWord, guessLetter)) {
                     // Mark as in same word
                     guessLetter.type = LetterType.RightWord;
                     incorrectLetters++;
@@ -104,7 +114,7 @@ function verifyPhrase(
             });
         });
 
-        // Second loop marks remaining letters as either out of word match or
+        // Third loop marks remaining letters as either out of word match or
         // missing
         phrase.forEach((pWord, wordIndex) => {
             pWord.forEach((pLetter, letterIndex) => {
