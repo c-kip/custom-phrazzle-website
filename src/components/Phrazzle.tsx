@@ -36,15 +36,19 @@ function findNearMiss(
     phrase: PhrazzleLetter[],
     guess: PhrazzleLetter
 ): boolean {
-    phrase.forEach((pLetter) => {
+    return !phrase.every((pLetter) => {
+        console.log(
+            `Phrase letter: ${pLetter.letter}, guessed: ${pLetter.guessed}`
+        );
+        console.log(`Checking against ${guess.letter}`);
         if (pLetter.letter === guess.letter && !pLetter.guessed) {
             // mark the letter as "used"
+            console.log(`Match found`);
             pLetter.guessed = true;
-            return true;
+            return false; // end the every()
         }
+        return true;
     });
-
-    return false;
 }
 
 function findDiffWord(
@@ -88,6 +92,9 @@ function verifyPhrase(
                     guessLetter.type = LetterType.Correct;
                 } else if (findNearMiss(pWord, guessLetter)) {
                     // Mark as in same word
+                    console.log(
+                        `Found same word match for ${guessLetter.letter}`
+                    );
                     guessLetter.type = LetterType.RightWord;
                 } else if (findDiffWord(phrase, guessLetter)) {
                     // Mark as in diff word
