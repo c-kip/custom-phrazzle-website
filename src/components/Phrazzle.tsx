@@ -37,13 +37,12 @@ function findNearMiss(
     guess: PhrazzleLetter
 ): boolean {
     return !phrase.every((pLetter) => {
-        // console.log(
-        //     `Phrase letter: ${pLetter.letter}, guessed: ${pLetter.guessed}`
-        // );
-        // console.log(`Checking against ${guess.letter}`);
-        if (pLetter.letter === guess.letter && !pLetter.guessed) {
+        if (
+            pLetter.letter === guess.letter &&
+            !pLetter.guessed &&
+            guess.type === LetterType.Guess
+        ) {
             // mark the letter as "used"
-            // console.log(`Match found`);
             pLetter.guessed = true;
             return false; // end the every()
         }
@@ -57,7 +56,11 @@ function findDiffWord(
 ): boolean {
     return !phrase.every((pWord) => {
         return pWord.every((pLetter) => {
-            if (pLetter.letter === guess.letter && !pLetter.guessed) {
+            if (
+                pLetter.letter === guess.letter &&
+                !pLetter.guessed &&
+                guess.type === LetterType.Guess
+            ) {
                 // mark the letter as "used"
                 pLetter.guessed = true;
                 return false; // end the every()
@@ -81,6 +84,7 @@ function verifyPhrase(
 
     // If the guess exists & has same length as phrase, verify it
     if (rawGuess !== "" && rawGuess.length === rawPhrase.length && verify) {
+        // First loop marks correct and same word matches
         phrase.forEach((pWord, wordIndex) => {
             pWord.forEach((pLetter, letterIndex) => {
                 const guessLetter = guess[wordIndex][letterIndex];
@@ -91,14 +95,22 @@ function verifyPhrase(
                     guessLetter.type = LetterType.Correct;
                 } else if (findNearMiss(pWord, guessLetter)) {
                     // Mark as in same word
-                    console.log(
-                        `Found same word match for ${guessLetter.letter}`
-                    );
                     guessLetter.type = LetterType.RightWord;
-                } else if (findDiffWord(phrase, guessLetter)) {
+                }
+            });
+        });
+
+        // Second loop marks remaining letters as either out of word match or
+        // missing
+        phrase.forEach((pWord, wordIndex) => {
+            pWord.forEach((pLetter, letterIndex) => {
+                const guessLetter = guess[wordIndex][letterIndex];
+
+                // Check for out of word matches
+                if (findDiffWord(phrase, guessLetter)) {
                     // Mark as in diff word
                     guessLetter.type = LetterType.WrongWord;
-                } else {
+                } else if (guessLetter.type === LetterType.Guess) {
                     // Mark as missing otherwise
                     guessLetter.type = LetterType.Miss;
                 }
