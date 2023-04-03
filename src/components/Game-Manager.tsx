@@ -109,6 +109,7 @@ function GameManager() {
     }
 
     useEffect(() => {
+        // TODO -> fix this required on all updates
         // Setup keyboard capturing
         document.addEventListener("keydown", keyboardHandler);
 

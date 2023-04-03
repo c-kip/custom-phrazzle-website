@@ -1,18 +1,19 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import { LetterType } from "../constants";
+import { PhrazzleLetter } from "../logic/PhrazzleLetter";
 
 interface LetterProps {
-    letter: string;
-    type: LetterType;
+    phrazzleLetter: PhrazzleLetter;
 }
 
 function Letter(props: LetterProps) {
+    const letter = props.phrazzleLetter.letter;
+    const type = props.phrazzleLetter.type;
     let boxBackground: string;
     let textColour: string;
-    const letter = props.letter.toUpperCase();
 
-    switch (props.type) {
+    switch (type) {
         case LetterType.Correct:
             boxBackground = "letter.background.correct";
             textColour = "letter.text.light";
@@ -21,11 +22,11 @@ function Letter(props: LetterProps) {
             boxBackground = "letter.background.miss";
             textColour = "letter.text.light";
             break;
-        case LetterType.DiffWord:
+        case LetterType.WrongWord:
             boxBackground = "letter.background.diffWord";
             textColour = "letter.text.light";
             break;
-        case LetterType.Close:
+        case LetterType.RightWord:
             boxBackground = "letter.background.close";
             textColour = "letter.text.light";
             break;

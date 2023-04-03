@@ -6,7 +6,7 @@ export const spaceChar = /^\ $/;
 export enum LetterType {
     Guess,
     Miss,
-    DiffWord,
-    Close,
+    WrongWord,
+    RightWord,
     Correct,
 }
