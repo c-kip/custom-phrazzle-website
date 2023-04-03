@@ -79,13 +79,15 @@ function GameManager() {
                     updateGameState(GameState.guess);
                     break;
                 case GameState.guess:
-                    // Update the current guess to be verified, maintain all others
-                    const allVerifies = [...verifies];
-                    allVerifies[allVerifies.length - 1] = true;
-                    allVerifies.push(false);
+                    if (guesses[guesses.length - 1].length === phrase.length) {
+                        // Update the current guess to be verified, maintain all others
+                        const allVerifies = [...verifies];
+                        allVerifies[allVerifies.length - 1] = true;
+                        allVerifies.push(false);
 
-                    setVerifies(allVerifies);
-                    setGuesses([...guesses, ""]);
+                        setVerifies(allVerifies);
+                        setGuesses([...guesses, ""]);
+                    }
                     break;
                 case GameState.finish:
                     updateGameState(GameState.start);
@@ -143,7 +145,6 @@ function GameManager() {
         <>
             <Typography>{gameMsg}</Typography>
             {guesses.map((guess, index) => {
-                console.log(`Verify guess? ${verifies[index]}`);
                 return (
                     <Phrazzle
                         phrase={phrase}
