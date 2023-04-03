@@ -96,6 +96,57 @@ function GameManager() {
                     console.error("Invalid game state with enter key");
                     break;
             }
+        } else if (event.key.toUpperCase() === "BACKSPACE") {
+            switch (gameState) {
+                case GameState.start:
+                    // Remove a character
+                    if (phrase.length > 0) {
+                        setPhrase(phrase.slice(0, phrase.length - 1));
+                        setLatestGuess(phrase.slice(0, phrase.length - 1));
+                    }
+                    break;
+                case GameState.guess:
+                    if (guesses[guesses.length - 1].length > 0) {
+                        const allGuesses = [...guesses];
+                        const oneLessGuessLength = allGuesses.length - 1;
+
+                        // Check for space to include in removal
+                        if (
+                            // If the "current" char is a space, remove prev char too
+                            allGuesses[oneLessGuessLength].length >= 2 &&
+                            spaceChar.test(
+                                allGuesses[oneLessGuessLength].charAt(
+                                    allGuesses[oneLessGuessLength].length - 1
+                                )
+                            )
+                        ) {
+                            allGuesses[oneLessGuessLength] = allGuesses[
+                                oneLessGuessLength
+                            ].slice(
+                                0,
+                                allGuesses[oneLessGuessLength].length - 2 // remove space as well
+                            );
+
+                            setGuesses(allGuesses);
+                        } else {
+                            allGuesses[oneLessGuessLength] = allGuesses[
+                                oneLessGuessLength
+                            ].slice(
+                                0,
+                                allGuesses[oneLessGuessLength].length - 1
+                            );
+
+                            setGuesses(allGuesses);
+                        }
+                    }
+                    break;
+                case GameState.finish:
+                    // Do nothing
+                    break;
+                default:
+                    console.error("Invalid game state with backspace key");
+                    break;
+            }
         }
 
         // Update the phrase to include the newest letter
