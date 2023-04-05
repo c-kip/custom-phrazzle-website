@@ -10,3 +10,5 @@ export enum LetterType {
     RightWord,
     Correct,
 }
+
+export const maxCharPerLine = 20

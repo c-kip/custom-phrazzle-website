@@ -1,8 +1,8 @@
+import { Stack } from "@mui/material";
 import React from "react";
-import { Grid } from "@mui/material";
-import Letter from "./Letter";
-import { LetterType } from "../constants";
+import { LetterType, maxCharPerLine } from "../constants";
 import { PhrazzleLetter } from "../logic/PhrazzleLetter";
+import Letter from "./Letter";
 
 interface PhrazzleProps {
     phrase: string;
@@ -169,40 +169,40 @@ function Phrazzle(props: PhrazzleProps) {
         }
     }
 
-    return (
-        <Grid
-            container
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-        >
-            {guess.map((word, wordIndex) => {
-                const key = wordIndex.toString() + word;
+    //Split into lines
+    const phrazzleSpace =  new PhrazzleLetter(" ", LetterType.Guess, false);
+    const lines: PhrazzleLetter[][] = []
+    let line = [...guess[0]]
+    guess.slice(1,).forEach((word) => {
+        if (line.length + word.length + 1 < maxCharPerLine)
+            line.push(phrazzleSpace, ...word)
+        else{
+            lines.push(line)
+            line = [...word]
+        }
+    })
+    lines.push(line)
 
-                return (
-                    <Grid
-                        container
-                        direction="row"
-                        justifyContent="center"
-                        alignItems="center"
-                        key={`grid-${wordIndex}`}
-                    >
-                        {/* Map each letter in the word to a Letter component */}
-                        {word.map((phrazzleLetter, index) => (
+    return (
+        <Stack 
+            direction="column" 
+            spacing={2} 
+        >
+
+            {lines.map((line, lineIndex) => (
+                <Stack 
+                    direction="row"
+                    key={lineIndex.toString()}
+                >
+                    {line.map((phrazzleLetter, index) => (
                             <Letter
-                                phrazzleLetter={phrazzleLetter}
-                                key={
-                                    wordIndex.toString() +
-                                    "-" +
-                                    index.toString() +
-                                    phrazzleLetter
-                                }
+                                    key={lineIndex.toString() + '-' + index.toString()}
+                                    phrazzleLetter={phrazzleLetter}
                             />
-                        ))}
-                    </Grid>
-                );
-            })}
-        </Grid>
+                    ))}
+                </Stack>
+            ))}
+        </Stack>
     );
 }
 

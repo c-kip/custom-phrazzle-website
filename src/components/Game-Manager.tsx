@@ -1,3 +1,4 @@
+import { Divider, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import {
     lowerCaseLetter,
@@ -6,7 +7,6 @@ import {
     validPunctuation,
 } from "../constants";
 import Phrazzle from "./Phrazzle";
-import { Typography } from "@mui/material";
 
 enum GameState {
     start,
@@ -199,17 +199,23 @@ function GameManager() {
     return (
         <>
             <Typography>{gameMsg}</Typography>
-            {guesses.map((guess, index) => {
-                return (
-                    <Phrazzle
-                        phrase={phrase}
-                        guess={guess}
-                        verify={verifies[index]}
-                        setFinish={setFinish}
-                        key={index.toString() + guess}
-                    />
-                );
-            })}
+            <Stack
+            direction="column"
+            divider={<Divider orientation="horizontal" flexItem />}
+            spacing={2}
+            >
+                {guesses.map((guess, index) => {
+                    return (
+                        <Phrazzle
+                            phrase={phrase}
+                            guess={guess}
+                            verify={verifies[index]}
+                            setFinish={setFinish}
+                            key={index.toString() + guess}
+                        />
+                    );
+                })}
+            </Stack>
         </>
     );
 }

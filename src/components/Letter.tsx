@@ -37,16 +37,19 @@ function Letter(props: LetterProps) {
             break;
     }
 
+    if (letter === " ")
+        return <Box minWidth="4%"/>
+
     return (
         <Box
+            display="flex"
             justifyContent="center"
-            sx={{
-                backgroundColor: boxBackground,
-                border: 2,
-                borderRadius: 1,
-                width: "5%",
-                height: "5%",
-            }}
+            ml={0.5}
+            width="5%"
+            height="5%"
+            bgcolor={boxBackground}
+            border={2}
+            borderRadius={1}
         >
             <Typography variant="h3" color={textColour}>
                 {letter}
