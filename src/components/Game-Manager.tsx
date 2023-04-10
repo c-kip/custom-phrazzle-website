@@ -21,6 +21,28 @@ const guessGameMsg =
 const finishGameMsg =
     "Congratulations! You guessed correct! Press enter to start a new game.";
 
+function deleteLetters(currentGuess: string): string {
+    let num = 1;
+    for (const letter of currentGuess.split("").reverse()) {
+        if (validPunctuation.test(letter) || spaceChar.test(letter)) num += 1;
+        else break;
+    }
+
+    return currentGuess.slice(0, -num);
+}
+
+function lettersToAdd(currentIndex: number, phrase: string): string {
+    let letters = "";
+    for (let i = currentIndex + 1; i < phrase.length; i++) {
+        const letter = phrase[i];
+        if (validPunctuation.test(letter) || spaceChar.test(letter))
+            letters += letter;
+        else break;
+    }
+
+    return letters;
+}
+
 function GameManager() {
     const [gameState, setGameState] = useState(GameState.start);
     const [gameMsg, setGameMsg] = useState(startGameMsg);
@@ -31,7 +53,7 @@ function GameManager() {
     const currentGuess = guesses[guesses.length - 1];
 
     function setFinish() {
-        setGameState(GameState.finish);
+        updateGameState(GameState.finish);
     }
 
     function setLatestGuess(guess: string) {
@@ -46,6 +68,8 @@ function GameManager() {
             case GameState.start:
                 setGameMsg(startGameMsg);
                 setPhrase("");
+                setGuesses([""]);
+                setVerifies([false]);
                 break;
             case GameState.guess:
                 setGameMsg(guessGameMsg);
@@ -53,6 +77,9 @@ function GameManager() {
                 break;
             case GameState.finish:
                 setGameMsg(finishGameMsg);
+                const allGuesses = [...guesses];
+                allGuesses.slice(0, -1);
+                setGuesses(allGuesses);
                 break;
             default:
                 setGameMsg("Game broken. 🙁");
@@ -94,6 +121,7 @@ function GameManager() {
                         setVerifies(allVerifies);
                         setGuesses([...guesses, ""]);
                     }
+                    if (currentGuess === phrase && phrase) setFinish();
                     break;
                 case GameState.finish:
                     updateGameState(GameState.start);
@@ -113,29 +141,8 @@ function GameManager() {
                     break;
                 case GameState.guess:
                     if (currentGuess.length > 0) {
-                        const allGuesses = [...guesses];
-                        const oneLessGuessLength = allGuesses.length - 1;
-
                         // If the "current" char is a space or punctuation, remove prev char too
-                        if (
-                            currentGuess.length >= 2 &&
-                            (spaceChar.test(currentGuess.slice(-1)) ||
-                                validPunctuation.test(currentGuess.slice(-1)))
-                        ) {
-                            allGuesses[oneLessGuessLength] = currentGuess.slice(
-                                0,
-                                -2 // remove space/punctuation as well
-                            );
-
-                            setGuesses(allGuesses);
-                        } else {
-                            allGuesses[oneLessGuessLength] = currentGuess.slice(
-                                0,
-                                -1
-                            );
-
-                            setGuesses(allGuesses);
-                        }
+                        setLatestGuess(deleteLetters(currentGuess));
                     }
                     break;
                 case GameState.finish:
@@ -159,17 +166,9 @@ function GameManager() {
                     // Can't guess punctuation. It is filled in for you
                     if (validPunctuation.test(letter)) break;
 
-                    // If the next letter is a space, include it
-                    if (spaceChar.test(phrase[currentGuess.length + 1])) {
-                        letter += " ";
-                    }
+                    // Automatically add spaces and punctuation
+                    letter += lettersToAdd(currentGuess.length, phrase);
 
-                    // If next letter is a punctuation, include it
-                    if (
-                        validPunctuation.test(phrase[currentGuess.length + 1])
-                    ) {
-                        letter += phrase[currentGuess.length + 1];
-                    }
                     // During guess, update the guess
                     if (currentGuess.length < phrase.length) {
                         setLatestGuess(currentGuess + letter);
@@ -211,7 +210,6 @@ function GameManager() {
                             phrase={phrase}
                             guess={guess}
                             verify={verifies[index]}
-                            setFinish={setFinish}
                             key={index.toString() + guess}
                         />
                     );

@@ -8,7 +8,6 @@ interface PhrazzleProps {
     phrase: string;
     guess: string;
     verify: boolean;
-    setFinish: Function;
 }
 
 function parsePhrase(phrase: string): PhrazzleLetter[][] {
@@ -75,15 +74,13 @@ function findDiffWord(
 function verifyPhrase(
     rawPhrase: string,
     rawGuess: string,
-    verify: boolean,
-    setFinish: Function
+    verify: boolean
 ): {
     phrase: PhrazzleLetter[][];
     guess: PhrazzleLetter[][];
 } {
     const phrase = parsePhrase(rawPhrase);
     const guess = parsePhrase(rawGuess);
-    let incorrectLetters = 0;
 
     // If the guess exists & has same length as phrase, verify it
     if (rawGuess !== "" && rawGuess.length === rawPhrase.length && verify) {
@@ -109,7 +106,6 @@ function verifyPhrase(
                 if (findNearMiss(pWord, guessLetter)) {
                     // Mark as in same word
                     guessLetter.type = LetterType.RightWord;
-                    incorrectLetters++;
                 }
             });
         });
@@ -124,18 +120,12 @@ function verifyPhrase(
                 if (findDiffWord(phrase, guessLetter)) {
                     // Mark as in diff word
                     guessLetter.type = LetterType.WrongWord;
-                    incorrectLetters++;
                 } else if (guessLetter.type === LetterType.Guess) {
                     // Mark as missing otherwise
                     guessLetter.type = LetterType.Miss;
-                    incorrectLetters++;
                 }
             });
         });
-
-        if (incorrectLetters === 0) {
-            setFinish();
-        }
     }
 
     return { phrase, guess };
@@ -145,8 +135,7 @@ function Phrazzle(props: PhrazzleProps) {
     const { phrase, guess } = verifyPhrase(
         props.phrase,
         props.guess,
-        props.verify,
-        props.setFinish
+        props.verify
     );
 
     //Add blanks and punctuation
