@@ -28,6 +28,8 @@ function GameManager() {
     const [guesses, setGuesses] = useState([""]);
     const [verifies, setVerifies] = useState([false]);
 
+    const currentGuess = guesses[guesses.length - 1];
+
     function setFinish() {
         setGameState(GameState.finish);
     }
@@ -83,7 +85,7 @@ function GameManager() {
                     updateGameState(GameState.guess);
                     break;
                 case GameState.guess:
-                    if (guesses[guesses.length - 1].length === phrase.length) {
+                    if (currentGuess.length === phrase.length) {
                         // Update the current guess to be verified, maintain all others
                         const allVerifies = [...verifies];
                         allVerifies[allVerifies.length - 1] = true;
@@ -110,34 +112,26 @@ function GameManager() {
                     }
                     break;
                 case GameState.guess:
-                    if (guesses[guesses.length - 1].length > 0) {
+                    if (currentGuess.length > 0) {
                         const allGuesses = [...guesses];
                         const oneLessGuessLength = allGuesses.length - 1;
 
-                        // Check for space to include in removal
+                        // If the "current" char is a space or punctuation, remove prev char too
                         if (
-                            // If the "current" char is a space, remove prev char too
-                            allGuesses[oneLessGuessLength].length >= 2 &&
-                            spaceChar.test(
-                                allGuesses[oneLessGuessLength].charAt(
-                                    allGuesses[oneLessGuessLength].length - 1
-                                )
-                            )
+                            currentGuess.length >= 2 &&
+                            (spaceChar.test(currentGuess.slice(-1)) ||
+                                validPunctuation.test(currentGuess.slice(-1)))
                         ) {
-                            allGuesses[oneLessGuessLength] = allGuesses[
-                                oneLessGuessLength
-                            ].slice(
+                            allGuesses[oneLessGuessLength] = currentGuess.slice(
                                 0,
-                                allGuesses[oneLessGuessLength].length - 2 // remove space as well
+                                -2 // remove space/punctuation as well
                             );
 
                             setGuesses(allGuesses);
                         } else {
-                            allGuesses[oneLessGuessLength] = allGuesses[
-                                oneLessGuessLength
-                            ].slice(
+                            allGuesses[oneLessGuessLength] = currentGuess.slice(
                                 0,
-                                allGuesses[oneLessGuessLength].length - 1
+                                -1
                             );
 
                             setGuesses(allGuesses);
@@ -162,18 +156,23 @@ function GameManager() {
                     setLatestGuess(phrase + letter);
                     break;
                 case GameState.guess:
+                    // Can't guess punctuation. It is filled in for you
+                    if (validPunctuation.test(letter)) break;
+
                     // If the next letter is a space, include it
-                    if (
-                        spaceChar.test(
-                            phrase[guesses[guesses.length - 1].length + 1]
-                        )
-                    ) {
+                    if (spaceChar.test(phrase[currentGuess.length + 1])) {
                         letter += " ";
                     }
 
+                    // If next letter is a punctuation, include it
+                    if (
+                        validPunctuation.test(phrase[currentGuess.length + 1])
+                    ) {
+                        letter += phrase[currentGuess.length + 1];
+                    }
                     // During guess, update the guess
-                    if (guesses[guesses.length - 1].length < phrase.length) {
-                        setLatestGuess(guesses[guesses.length - 1] + letter);
+                    if (currentGuess.length < phrase.length) {
+                        setLatestGuess(currentGuess + letter);
                     }
                     break;
                 case GameState.finish:
@@ -198,11 +197,13 @@ function GameManager() {
 
     return (
         <>
-            <Typography>{gameMsg}</Typography>
+            <Typography variant="h6" my={2}>
+                {gameMsg}
+            </Typography>
             <Stack
-            direction="column"
-            divider={<Divider orientation="horizontal" flexItem />}
-            spacing={2}
+                direction="column"
+                divider={<Divider orientation="horizontal" flexItem />}
+                spacing={2}
             >
                 {guesses.map((guess, index) => {
                     return (

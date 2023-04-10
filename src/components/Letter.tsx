@@ -1,6 +1,6 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
-import { LetterType } from "../constants";
+import { LetterType, validPunctuation } from "../constants";
 import { PhrazzleLetter } from "../logic/PhrazzleLetter";
 
 interface LetterProps {
@@ -37,16 +37,29 @@ function Letter(props: LetterProps) {
             break;
     }
 
-    if (letter === " ")
-        return <Box minWidth="4%"/>
+    if (letter === "space") return <Box minWidth="4%" />;
+
+    if (letter === "blank")
+        return (
+            <Box ml={0.5} width="5%" border={2} borderRadius={1}>
+                <Typography variant="h3" color="white">
+                    X
+                </Typography>
+            </Box>
+        );
+
+    if (validPunctuation.test(letter))
+        return (
+            <Typography variant="h3" ml={0.5}>
+                {letter}
+            </Typography>
+        );
 
     return (
         <Box
-            display="flex"
-            justifyContent="center"
+            textAlign="center"
             ml={0.5}
             width="5%"
-            height="5%"
             bgcolor={boxBackground}
             border={2}
             borderRadius={1}

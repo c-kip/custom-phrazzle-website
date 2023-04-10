@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import React from "react";
-import { LetterType, maxCharPerLine } from "../constants";
+import { LetterType, maxCharPerLine, validPunctuation } from "../constants";
 import { PhrazzleLetter } from "../logic/PhrazzleLetter";
 import Letter from "./Letter";
 
@@ -149,56 +149,57 @@ function Phrazzle(props: PhrazzleProps) {
         props.setFinish
     );
 
-    // Fill the guess with blanks at the end if the phrase has been set
-    if (props.phrase.length > props.guess.length) {
-        for (let wordIndex = 0; wordIndex < phrase.length; wordIndex++) {
-            // Add a blank word if needed
-            if (wordIndex >= guess.length) {
-                guess.push([]);
-            }
+    //Add blanks and punctuation
+    const blankLetter = new PhrazzleLetter("blank", LetterType.Guess, false);
+    const spaceLetter = new PhrazzleLetter("space", LetterType.Guess, false);
 
-            const letterDiff =
-                phrase[wordIndex].length - guess[wordIndex].length;
-            if (letterDiff > 0) {
-                for (let i = 0; i < letterDiff; i++) {
-                    guess[wordIndex].push(
-                        new PhrazzleLetter("?", LetterType.Guess, false)
+    //Add missing words
+    for (let gWords = guess.length; gWords < phrase.length; gWords++) {
+        guess.push([]);
+    }
+
+    // Fill with blanks, or punctuation
+    for (let word = 0; word < phrase.length; word++) {
+        if (guess[word].length === phrase[word].length) continue;
+        for (let letter = 0; letter < phrase[word].length; letter++) {
+            if (!guess[word][letter])
+                if (validPunctuation.test(phrase[word][letter].letter))
+                    guess[word][letter] = new PhrazzleLetter(
+                        phrase[word][letter].letter,
+                        LetterType.Guess,
+                        false
                     );
-                }
-            }
+                else guess[word][letter] = blankLetter;
         }
     }
 
-    //Split into lines
-    const phrazzleSpace =  new PhrazzleLetter(" ", LetterType.Guess, false);
-    const lines: PhrazzleLetter[][] = []
-    let line = [...guess[0]]
-    guess.slice(1,).forEach((word) => {
-        if (line.length + word.length + 1 < maxCharPerLine)
-            line.push(phrazzleSpace, ...word)
-        else{
-            lines.push(line)
-            line = [...word]
+    //Conert into lines
+    const lines: PhrazzleLetter[][] = [];
+    let line: PhrazzleLetter[] = [];
+
+    guess.forEach((word) => {
+        word.push(spaceLetter);
+
+        if (line.length + word.length <= maxCharPerLine) line.push(...word);
+        else {
+            line.pop(); //remove last space
+            lines.push(line);
+            line = [...word];
         }
-    })
-    lines.push(line)
+    });
+
+    line.pop(); //remove last space
+    lines.push(line);
 
     return (
-        <Stack 
-            direction="column" 
-            spacing={2} 
-        >
-
+        <Stack direction="column" spacing={2}>
             {lines.map((line, lineIndex) => (
-                <Stack 
-                    direction="row"
-                    key={lineIndex.toString()}
-                >
+                <Stack direction="row" key={lineIndex.toString()}>
                     {line.map((phrazzleLetter, index) => (
-                            <Letter
-                                    key={lineIndex.toString() + '-' + index.toString()}
-                                    phrazzleLetter={phrazzleLetter}
-                            />
+                        <Letter
+                            key={lineIndex.toString() + "-" + index.toString()}
+                            phrazzleLetter={phrazzleLetter}
+                        />
                     ))}
                 </Stack>
             ))}
